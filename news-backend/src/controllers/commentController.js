@@ -43,6 +43,58 @@ const addComment = async (req, res) => {
     }
 };
 
+// @desc    Get all comments (Admin only)
+// @route   GET /api/comments
+// @access  Private/Admin
+const getComments = async (req, res) => {
+    try {
+        const comments = await prisma.comment.findMany({
+            include: {
+                user: { select: { id: true, name: true, email: true } },
+                article: { select: { id: true, title: true } }
+            },
+            orderBy: { createdAt: 'desc' }
+        });
+        res.json(comments);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// @desc    Update a comment
+// @route   PUT /api/comments/:id
+// @access  Private
+const updateComment = async (req, res) => {
+    const { content } = req.body;
+
+    try {
+        const comment = await prisma.comment.findUnique({
+            where: { id: req.params.id },
+        });
+
+        if (!comment) {
+            return res.status(404).json({ message: 'Comment not found' });
+        }
+
+        // Check ownership or admin
+        if (comment.userId !== req.user.id && req.user.role !== 'ADMIN') {
+            return res.status(403).json({ message: 'Not authorized' });
+        }
+
+        const updatedComment = await prisma.comment.update({
+            where: { id: req.params.id },
+            data: { content },
+            include: {
+                user: { select: { name: true } }
+            }
+        });
+
+        res.json(updatedComment);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 // @desc    Delete a comment
 // @route   DELETE /api/comments/:id
 // @access  Private
@@ -83,5 +135,7 @@ const deleteComment = async (req, res) => {
 
 module.exports = {
     addComment,
+    getComments,
+    updateComment,
     deleteComment,
 };

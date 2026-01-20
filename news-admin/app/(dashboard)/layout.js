@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Sidebar from '../Sidebar';
+import Sidebar from '../../components/Sidebar';
 import { useAuth } from '../../context/AuthContext';
 
 export default function DashboardLayout({ children }) {
