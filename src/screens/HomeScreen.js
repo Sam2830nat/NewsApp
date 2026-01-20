@@ -14,25 +14,31 @@ const HomeScreen = ({ navigation }) => {
 
     const fetchNews = async () => {
         setLoading(true);
-        const categoryParam = selectedCategory === 'All' ? 'general' : selectedCategory.toLowerCase();
-        const articles = await getTopHeadlines(categoryParam);
+        // selectedCategory is now an ID (or 'All')
+        try {
+            const articles = await getTopHeadlines(selectedCategory);
 
-        // Transform API data to match our component structure
-        const formattedNews = articles.map((item, index) => ({
-            id: index.toString(),
-            title: item.title,
-            description: item.description,
-            imageUrl: item.urlToImage,
-            category: selectedCategory === 'All' ? 'General' : selectedCategory,
-            source: item.source.name,
-            publishedAt: new Date(item.publishedAt).toLocaleDateString(),
-            isBreaking: index === 0, // First item is breaking (simplified logic)
-            url: item.url,
-            content: item.content
-        }));
+            // Transform API data to match our component structure
+            // Backend returns: _id, title, content, image, category, author, createdAt
+            const formattedNews = articles.map((item, index) => ({
+                id: item.id || item._id, // Handle both id formats
+                slug: item.slug,
+                title: item.title,
+                description: item.content ? item.content.substring(0, 100) + '...' : '',
+                imageUrl: item.image, // Backend uses 'image'
+                category: item.category ? item.category.name : 'General',
+                source: item.author ? item.author.name : 'Unknown',
+                publishedAt: new Date(item.createdAt).toLocaleDateString(),
+                isBreaking: index === 0,
+                content: item.content
+            }));
 
-        setNews(formattedNews);
-        setLoading(false);
+            setNews(formattedNews);
+        } catch (e) {
+            console.error(e);
+        } finally {
+            setLoading(false);
+        }
     };
 
     useEffect(() => {
@@ -45,10 +51,14 @@ const HomeScreen = ({ navigation }) => {
         setRefreshing(false);
     };
 
+    const handlePress = (article) => {
+        navigation.navigate('ArticleDetail', { idOrSlug: article.id });
+    };
+
     return (
         <SafeAreaView style={styles.container} edges={['top']}>
             <Layout style={styles.header}>
-                <Text category='h4' style={styles.headerTitle}>GeminiNews</Text>
+                <Text category='h4' style={styles.headerTitle}>NewsApp</Text>
             </Layout>
             <Divider />
             <CategorySelector
@@ -68,8 +78,15 @@ const HomeScreen = ({ navigation }) => {
                         </View>
                     ) : (
                         news.map((item) => (
-                            <NewsCard key={item.id} article={item} onPress={() => { }} />
+                            <NewsCard
+                                key={item.id}
+                                article={item}
+                                onPress={() => handlePress(item)}
+                            />
                         ))
+                    )}
+                    {news.length === 0 && !loading && (
+                        <Text style={{ textAlign: 'center', marginTop: 20 }}>No news found.</Text>
                     )}
                 </Layout>
             </ScrollView>

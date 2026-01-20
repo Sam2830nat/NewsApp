@@ -1,10 +1,20 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { Layout, Text } from '@ui-kitten/components';
-
-const CATEGORIES = ['All', 'Technology', 'Business', 'Sports', 'Health', 'Environment', 'Entertainment'];
+import { getCategories } from '../services/CategoryService';
 
 const CategorySelector = ({ selectedCategory, onSelectCategory }) => {
+    const [categories, setCategories] = useState([]);
+
+    useEffect(() => {
+        const fetchCategories = async () => {
+            const data = await getCategories();
+            // Add 'All' option manually
+            setCategories([{ id: 'All', name: 'All' }, ...data]);
+        };
+        fetchCategories();
+    }, []);
+
     return (
         <Layout style={styles.container}>
             <ScrollView
@@ -12,26 +22,26 @@ const CategorySelector = ({ selectedCategory, onSelectCategory }) => {
                 showsHorizontalScrollIndicator={false}
                 contentContainerStyle={styles.scrollContent}
             >
-                {CATEGORIES.map((category) => (
+                {categories.map((category) => (
                     <TouchableOpacity
-                        key={category}
-                        onPress={() => onSelectCategory(category)}
+                        key={category.id}
+                        onPress={() => onSelectCategory(category.id)}
                         activeOpacity={0.7}
                     >
                         <Layout
                             style={[
                                 styles.categoryChip,
-                                selectedCategory === category && styles.categoryChipActive,
+                                selectedCategory === category.id && styles.categoryChipActive,
                             ]}
                         >
                             <Text
                                 category='s2'
                                 style={[
                                     styles.categoryText,
-                                    selectedCategory === category && styles.categoryTextActive,
+                                    selectedCategory === category.id && styles.categoryTextActive,
                                 ]}
                             >
-                                {category}
+                                {category.name}
                             </Text>
                         </Layout>
                     </TouchableOpacity>

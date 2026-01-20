@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "GeminiNews",
-    "slug": "GeminiNews",
+    "name": "NewsApp",
+    "slug": "NewsApp",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",

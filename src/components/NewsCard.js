@@ -6,8 +6,12 @@ const NewsCard = ({ article, onPress }) => {
     const { title, description, imageUrl, category, source, publishedAt, isBreaking } = article;
 
     return (
-        <TouchableOpacity onPress={onPress} activeOpacity={0.8}>
-            <Card style={styles.card}>
+        <TouchableOpacity
+            onPress={onPress}
+            activeOpacity={0.7}
+            style={styles.touchable}
+        >
+            <Card style={styles.card} disabled={true}>
                 {imageUrl && (
                     <Image
                         source={{ uri: imageUrl }}
@@ -43,8 +47,11 @@ const NewsCard = ({ article, onPress }) => {
 };
 
 const styles = StyleSheet.create({
-    card: {
+    touchable: {
         marginBottom: 16,
+    },
+    card: {
+        marginBottom: 0,
         borderRadius: 8,
     },
     image: {

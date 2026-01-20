@@ -8,6 +8,27 @@ import AppNavigator from './src/navigation/AppNavigator';
 import customTheme from './src/theme/custom-theme.json';
 import customMapping from './src/theme/mapping.json';
 
+import { AuthProvider } from './src/context/AuthContext';
+
+const linking = {
+  config: {
+    screens: {
+      Main: {
+        screens: {
+          Tabs: '',
+          ArticleDetail: 'news/:idOrSlug',
+        },
+      },
+      Auth: {
+        screens: {
+          Login: 'login',
+          Register: 'register',
+        },
+      },
+    },
+  },
+};
+
 const AppContent = () => {
   const { theme } = useTheme();
 
@@ -17,7 +38,7 @@ const AppContent = () => {
       theme={{ ...eva[theme], ...customTheme }}
       customMapping={customMapping}
     >
-      <NavigationContainer>
+      <NavigationContainer linking={linking}>
         <AppNavigator />
       </NavigationContainer>
     </ApplicationProvider>
@@ -29,7 +50,9 @@ export default function App() {
     <>
       <IconRegistry icons={EvaIconsPack} />
       <ThemeProvider>
-        <AppContent />
+        <AuthProvider>
+          <AppContent />
+        </AuthProvider>
       </ThemeProvider>
     </>
   );
