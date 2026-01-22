@@ -19,7 +19,7 @@ export default function NewsPage() {
         content: '',
         image: '',
         categoryId: '',
-        status: 'published'
+        status: 'PUBLISHED'
     });
 
     const fetchNews = async () => {
@@ -60,7 +60,7 @@ export default function NewsPage() {
             content: '',
             image: '',
             categoryId: categories[0]?.id || '',
-            status: 'published'
+            status: 'PUBLISHED'
         });
         setModalOpen(true);
     };
